@@ -20,6 +20,8 @@ class Model extends \Nubersoft\nApp
 		}
 		$url		.=	'.directscale.com/v1/';
 		self::$con	=	new \Nubersoft\nRemote($url, false);
+		# Create a define() for the API in your application key like:
+		# define('DIRECTSCALE_APIKEY', 'thekey123goeshere321');
 		self::$con->addHeader('Ocp-Apim-Subscription-Key', DIRECTSCALE_APIKEY);
 	}
 	/**
