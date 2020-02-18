@@ -1,9 +1,9 @@
 {
-    "name": "rasclatt/directscale",
+    "name": "block-ops/directscale-sdk-php",
     "type": "library",
     "description": "Class Library For the DirectScale API",
     "keywords": ["DirectScale","API","framework","mlm"],
-    "homepage": "https://github.com/rasclatt/directscale",
+    "homepage": "https://github.com/block-ops/directscale-sdk-php",
     "license": "MIT",
     "authors": [
         {
