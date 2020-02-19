@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map>
+	<address_line_1>~street1~</address_line_1>
+	<address_line_2>~street2~</address_line_2>
+	<address_line_3>~street3~</address_line_3>
+	<city>~city~</city>
+	<state>~region~</state>
+	<zip>~postal_code~</zip>
+	<country>~country_code~</country>
+	<name>~first_name~ ~last_name~</name>
+</map>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map>
+	<uid>~customer_id~</uid>
+	<distid>~back_office_id~</distid>
+	<birth_date>~birth_date~</birth_date>
+	<company>~company_name~</company>
+	<active>~customer_status~</active>
+	<member_type>~customer_type~</member_type>
+	<email>~email_address~</email>
+	<sponsor>~sponsor_id~</sponsor>
+	<enroller_id>~enroller_id~</enroller_id>
+	<external_ref>~external_reference_id~</external_ref>
+	<join_date>~signup_date~</join_date>
+	<first_name>~first_name~</first_name>
+	<cancel_date>~inactive_date~</cancel_date>
+	<language>~language_code~</language>
+	<last_name>~last_name~</last_name>
+	<day_phone>~primary_phone~</day_phone>
+	<night_phone>~secondary_phone~</night_phone>
+	<send_emails>~send_emails~</send_emails>
+	<cell_phone>~text_phone~</cell_phone>
+	<tax_exempt_id>~tax_exempt_id~</tax_exempt_id>
+	<tax_id>~tax_id~</tax_id>
+	<terms_accepted>~terms_accepted~</terms_accepted>
+	<username>~username~</username>
+	<repname>~web_alias~</repname>
+</map>
