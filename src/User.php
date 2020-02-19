@@ -25,14 +25,15 @@ class User extends Model
 	 */
 	public	function getDistInfo($reformat = true)
 	{
-		$this->data	=
 		$data		=	$this->doGet('customers/?backofficeid='.$this->distid);
 		
 		if(empty($data))
 			return $data;
 		
-		if(!$reformat)
+		if(!$reformat) {
+			$this->data	=	json_decode(trim($data), 1);
 			return $this->getData();
+		}
 		
 		$Conv	=	$this->getHelper('Conversion\Data');
 		$data	=	$this->normalizeKeys(json_decode($data, 1));
@@ -49,7 +50,7 @@ class User extends Model
 		$main['billing']	=	$billing;
 		$main['shipping']	=	$shipping;
 		
-		return $main;
+		return $this->data	=	$main;
 	}
 	
 	public	function sortUserData($array=false)
@@ -97,5 +98,13 @@ class User extends Model
 	public	function getData()
 	{
 		return $this->data;
+	}
+	/**
+	 *	@description	
+	 */
+	public	function setAttr($key, $value)
+	{
+		$this->data[$key]	=	$value;
+		return $this;
 	}
 }

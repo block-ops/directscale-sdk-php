@@ -8,26 +8,27 @@ class Model extends \Nubersoft\nApp
 	protected	static	$con;
 	private		static	$url		=	false;
 	private		static	$version	=	'v1';
+	private		static	$env		=	'';
 	/**
 	 *	@description	
 	 */
-	public	function __construct($env = false)
+	public	function __construct()
 	{
-		self::setUrl($env);
+		self::setUrl();
 		self::$con	=	new \Nubersoft\nRemote(self::$url, false);
 		# Create a define() for the API in your application key like:
 		# define('DIRECTSCALE_APIKEY', 'thekey123goeshere321');
 		self::$con->addHeader(...[
 			'Ocp-Apim-Subscription-Key',
-			constant("DIRECTSCALE_".strtoupper($env)."APIKEY")
+			constant("DIRECTSCALE_".strtoupper(self::$env)."APIKEY")
 		]);
 	}
 	/**
 	 *	@description	
 	 */
-	public	static function setUrl($env)
+	public	static function setUrl()
 	{	
-		$type		=	(!empty($env))? "-".strtolower($env) : $env;
+		$type		=	(!empty(self::$env))? "-".strtolower(self::$env) : self::$env;
 		self::$url	=	"https://dsapi{$type}.directscale.com/".self::$version."/";
 	}
 	/**
@@ -36,6 +37,13 @@ class Model extends \Nubersoft\nApp
 	public	static function setVersion($version)
 	{
 		self::$version	=	$version;
+	}
+	/**
+	 *	@description	
+	 */
+	public	static function setMode($env)
+	{
+		self::$env	=	$env;
 	}
 	/**
 	 *	@description	
