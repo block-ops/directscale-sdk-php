@@ -28,11 +28,11 @@ use \DirectScale\ {
 };
 
 try {
-	$User			=	new User('15F92');
-	$Subscription	=	new Subscription($User);
-	$Orders			=	new Orders($User);
-	$Products		=	new Products();
-	$Stores			=	new Stores($Products);
+	$User = new User('15F92');
+	$Subscription =	new Subscription($User);
+	$Orders = new Orders($User);
+	$Products = new Products();
+	$Stores = new Stores($Products);
 
 	print_r([
 		# Notice here that the autoship is appended to the user data
