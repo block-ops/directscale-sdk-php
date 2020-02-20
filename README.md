@@ -15,7 +15,7 @@ $DirectScale = new \DirectScale\User(54321);
 # Get distributor details
 print_r($DirectScale->getDistInfo());
 ````
-###Example of common data functions:###
+### Example of common data functions:
 
 ```php
 <?php
