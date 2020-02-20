@@ -24,4 +24,5 @@
 	<terms_accepted>~terms_accepted~</terms_accepted>
 	<username>~username~</username>
 	<repname>~web_alias~</repname>
+	<full_name>~first_name~ ~last_name~</full_name>
 </map>
