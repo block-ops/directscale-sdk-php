@@ -25,17 +25,18 @@ class User extends Model
 	 */
 	public	function getDistInfo($reformat = true)
 	{
-		$this->data	=
-		$data		=	$this->doGet('customers/?backofficeid='.$this->distid);
+		$this->data		=	$this->doGet('customers/?backofficeid='.$this->distid);
 		
-		if(empty($data))
-			return $data;
+		if(empty($this->data))
+			return $this->data;
 		
-		if(!$reformat)
+		if(!$reformat) {
+			$this->data	=	json_decode(trim($this->data), 1);
 			return $this->getData();
+		}
 		
 		$Conv	=	$this->getHelper('Conversion\Data');
-		$data	=	$this->normalizeKeys(json_decode($data, 1));
+		$data	=	$this->formatReturn($this->data);
 		$map	=	$Conv->xmlToArray($this->getResourceFile('gsmapping'.DS.'getdistinfo.xml'));
 		$bill	=	$Conv->xmlToArray($this->getResourceFile('gsmapping'.DS.'billing.xml'));
 		
@@ -49,7 +50,7 @@ class User extends Model
 		$main['billing']	=	$billing;
 		$main['shipping']	=	$shipping;
 		
-		return $main;
+		return $this->data	=	$main;
 	}
 	
 	public	function sortUserData($array=false)
@@ -94,8 +95,49 @@ class User extends Model
 	/**
 	 *	@description	
 	 */
-	public	function getData()
+	public	function getData($key = false)
 	{
+		if($key)
+			return $this->getAttr($key);
+		
 		return $this->data;
+	}
+	/**
+	 *	@description	
+	 */
+	public	function setAttr($key, $value, $subkey = false)
+	{
+		if(!empty($subkey)) {
+			if(!isset($this->data[$key]))
+				$this->data[$key]	=	[];
+			
+			$this->data[$key][$subkey]	=	$value;
+		}
+		else
+			$this->data[$key]	=	$value;
+		
+		ksort($this->data);
+		
+		return $this;
+	}
+	/**
+	 *	@description	
+	 */
+	public	function getAttr($key, $subkey = false)
+	{
+		if(!empty($subkey))
+			return (!empty($this->data[$key][$subkey]))? $this->data[$key][$subkey] : false;
+		
+		return (isset($this->data[$key]))? $this->data[$key] : false;
+	}
+	/**
+	 *	@description	
+	 */
+	public	function createDataSet($force = false)
+	{
+		if(empty($this->data) || $force)
+			$this->getDistInfo();
+		
+		return $this;
 	}
 }
