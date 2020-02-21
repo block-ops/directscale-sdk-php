@@ -7,9 +7,8 @@ Also a note, the [Nubersoft Framework](https://github.com/rasclatt/nubersoft) is
 Here is an example of fetching user data:
 
 ```php
-<?php
 # Create define
-define('DIRECTSCALE_APIKEY', 'yourkey123here321');
+define('DIRECTSCALE_APIKEY', 'your123prod456key543here210');
 # Create instance
 $DirectScale = new \DirectScale\User(54321);
 # Get distributor details
@@ -18,7 +17,6 @@ print_r($DirectScale->getDistInfo());
 ### Example of common data functions:
 
 ```php
-<?php
 use \DirectScale\ {
 	User,
 	User\Subscription,
@@ -64,8 +62,12 @@ use \DirectScale\ {
     Model as Connection,
     User
 };
+# You will need a "dev" version of the API key
+define('DIRECTSCALE_DEVAPIKEY', 'your123dev456key654here321');
+# You can also save your regular key
+define('DIRECTSCALE_APIKEY', 'your123prod456key543here210');
 # Set the dev mode here
-Connection::setMode('dev');
+Connection::setMode('dev'); # <--- Comment out this line to make live
 # Start a user class
 $User = new User(12345);
 # Fetch the data
