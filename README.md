@@ -56,3 +56,25 @@ catch(\DirectScale\Exception $e) {
 	echo $e->getErrorTransactionId();
 }
 ```
+## Setting Developer Mode
+Before instanciating, use the static method with `dev` as the parameter:
+
+```php
+use \DirectScale\ {
+    Model as Connection,
+    User
+};
+# Set the dev mode here
+Connection::setMode('dev');
+# Start a user class
+$User = new User(12345);
+# Fetch the data
+$info = $User->getDistInfo();
+# Write out the api url
+echo $User->getConnection()->getUrl();
+```
+This should produce the `dev` url:
+
+```
+https://dsapi-dev.directscale.com/v1/customers/?backofficeid=12345
+```
