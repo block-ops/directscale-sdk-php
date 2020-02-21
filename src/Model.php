@@ -5,6 +5,7 @@ namespace DirectScale;
  */
 class Model extends \Nubersoft\nApp
 {
+	protected	static	$apikey;
 	protected	static	$con;
 	protected	static	$url		=	false;
 	protected	static	$version	=	'v1';
@@ -15,6 +16,20 @@ class Model extends \Nubersoft\nApp
 	public	function __construct()
 	{
 		self::setUrl();
+	}
+	/**
+	 *	@description	
+	 */
+	public	static	function setApiKey($key)
+	{
+		self::$apikey	=	$key;
+	}
+	/**
+	 *	@description	
+	 */
+	protected	static	function getApiKey()
+	{
+		return (!empty(self::$apikey))? self::$apikey : constant("DIRECTSCALE_".strtoupper(self::$env)."APIKEY");
 	}
 	/**
 	 *	@description	
@@ -48,7 +63,7 @@ class Model extends \Nubersoft\nApp
 		# define('DIRECTSCALE_APIKEY', 'thekey123goeshere321');
 		self::$con->addHeader(...[
 			'Ocp-Apim-Subscription-Key',
-			constant("DIRECTSCALE_".strtoupper(self::$env)."APIKEY")
+			self::getApiKey()
 		]);
 		
 		$data	=	self::$con->{__FUNCTION__}($path)->query($attr, false, $type)->getResults(false);
@@ -165,5 +180,12 @@ class Model extends \Nubersoft\nApp
 			return [];
 		
 		return $this->normalizeKeys(json_decode($string, $array));
+	}
+	/**
+	 *	@description	
+	 */
+	public	function getConnection()
+	{
+		return self::$con;
 	}
 }
