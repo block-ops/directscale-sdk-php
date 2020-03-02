@@ -18,7 +18,7 @@ class Subscription
 			return false;
 		}
 		
-		$this->autoships	=	$this->User->doGet('customers/'.$this->data['general']['uid'].'/autoships');
+		$this->autoships	=	$this->User->getClient()->doGet('customers/'.$this->data['general']['uid'].'/autoships');
 		$this->User->setAttr('autoship', (empty($this->autoships))? [] : $this->autoships);
 	}
 	/**
@@ -36,7 +36,7 @@ class Subscription
 		$count	=	count($this->autoships);
 		if($count == 1) {
 			# Delete
-			$this->doDelete('orders/autoship/'.$this->autoships[0]['id']);
+			$this->User->getClient()->doDelete('orders/autoship/'.$this->autoships[0]['id']);
 			# Reset the autoships
 			$this->__construct($this->User);
 		}
@@ -47,7 +47,7 @@ class Subscription
 				# See if an id match OR there is no specific id to delete
 				if($idmatch || empty($id)) {
 					# Delete the autoship if set
-					$this->doDelete('orders/autoship/'.$as['id']);
+					$this->User->getClient()->doDelete('orders/autoship/'.$as['id']);
 					# Stop if an id is supplied
 					if(!empty($id))
 						break;

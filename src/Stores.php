@@ -12,7 +12,7 @@ class Stores extends Model
 	public	function __construct(Products $Products)
 	{
 		$this->Products	=	$Products;
-		$stores			=	$this->doGet('products/stores');
+		$stores			=	$this->getClient()->doGet('products/stores');
 		$stores			=	(!empty($stores))? $this->formatReturn($stores) : [];
 		
 		foreach($stores as $store) {
@@ -27,6 +27,23 @@ class Stores extends Model
 	 */
 	public	function getStores()
 	{
+		$args	=	func_get_args();
+		
+		if(!empty($args[0])) {
+			if(is_numeric($args[0])) {
+				return (isset($this->stores[$args[0]]))? $this->stores[$args[0]] : false;
+			}
+			elseif(is_string($args[0])) {
+				$key	=	array_search($args[0], $this->stores);
+				if($key === false)
+					return false;
+				
+				return $key;
+			}
+			else
+				return false;
+		}
+		
 		return $this->stores;
 	}
 	/**
@@ -57,7 +74,7 @@ class Stores extends Model
 		if(empty($sid)) {
 			$new	=	[];
 			foreach($this->getStores() as $sid => $name) {
-				$cat	=	$this->doGet("products/store/{$sid}/categories");
+				$cat	=	$this->getClient()->doGet("products/store/{$sid}/categories");
 				if(empty($cat) || trim($cat) == '[]')
 					continue;
 				
@@ -68,7 +85,7 @@ class Stores extends Model
 		}
 		# This will fetch a specfic category
 		else {
-			$data	=	$this->doGet("products/store/{$sid}/categories");
+			$data	=	$this->getClient()->doGet("products/store/{$sid}/categories");
 
 			if(empty($data) || trim($data) == '[]') {
 				return [];
@@ -82,7 +99,7 @@ class Stores extends Model
 	 */
 	public	function getRegions()
 	{
-		$data	=	$this->doGet('products/regions');
+		$data	=	$this->getClient()->doGet('products/regions');
 		
 		if(empty($data)) {
 			return $this->regions	=	[];

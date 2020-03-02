@@ -16,7 +16,7 @@ class Products extends Model
 		if($sku)
 			return $this->getBySku($sky);
 		
-		$products	=	$this->doGet('products/items');
+		$products	=	$this->getClient()->doGet('products/items');
 		
 		if(empty($products)) {
 			return  $this->products	=	[];
@@ -47,7 +47,7 @@ class Products extends Model
 		# Note this produces a fatal error if the currency and lang is empty despite
 		# the docs saying they are optional
 		try {
-			$data	=	$this->doGet('products/item/sku/'.$sku, (empty($settings))? false : $settings);
+			$data	=	$this->getClient()->doGet('products/item/sku/'.$sku, (empty($settings))? false : $settings);
 		}
 		catch(\DirectScale\Exception $e) {
 			return $this->products	=	[];

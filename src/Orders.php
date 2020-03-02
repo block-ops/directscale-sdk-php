@@ -19,7 +19,7 @@ class Orders extends Model
 			'orders'
 		]);
 		
-		$this->orders	=	$this->doGet($str);
+		$this->orders	=	$this->getClient()->doGet($str);
 		
 		if(empty($this->orders)) {
 			$this->User->setAttr('orders', []);

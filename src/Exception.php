@@ -18,7 +18,7 @@ class Exception extends \Exception
 	public	function getErrorMessage()
 	{
 		$data	=	$this->getErrorData();
-		return $data['message'];
+		return $data['msg'];
 	}
 	/**
 	 *	@description	
@@ -35,5 +35,13 @@ class Exception extends \Exception
 	{
 		$data	=	$this->getErrorData();
 		return $data['activityId'];
+	}
+	/**
+	 *	@description	
+	 */
+	public	function __toSting()
+	{
+		$data	=	$this->getErrorData();
+		return $data['msg'];
 	}
 }

@@ -5,36 +5,39 @@ namespace DirectScale;
  */
 class Model extends \Nubersoft\nApp
 {
+	protected	$headers, $errors, $response, $fullpath;
 	protected	static	$apikey;
 	protected	static	$con;
 	protected	static	$url		=	false;
 	protected	static	$version	=	'v1';
 	protected	static	$env		=	'';
+	private		$obj				=	[];
+	private		static	$Client;
 	/**
 	 *	@description	
 	 */
 	public	function __construct()
 	{
-		self::setUrl();
+		//self::setUrl();
 	}
 	/**
 	 *	@description	
 	 */
-	public	static	function setApiKey($key)
+	public final static	function setApiKey($key)
 	{
 		self::$apikey	=	$key;
 	}
 	/**
 	 *	@description	
 	 */
-	protected	static	function getApiKey()
+	protected final static	function getApiKey()
 	{
 		return (!empty(self::$apikey))? self::$apikey : constant("DIRECTSCALE_".strtoupper(self::$env)."APIKEY");
 	}
 	/**
 	 *	@description	
 	 */
-	public	static function setUrl()
+	public final static function setUrl()
 	{	
 		$type		=	(!empty(self::$env))? "-".strtolower(self::$env) : self::$env;
 		self::$url	=	"https://dsapi{$type}.directscale.com/".self::$version."/";
@@ -42,88 +45,28 @@ class Model extends \Nubersoft\nApp
 	/**
 	 *	@description	
 	 */
-	public	static function setVersion($version)
+	public final static function setVersion($version) : ?string
 	{
 		self::$version	=	$version;
 	}
 	/**
 	 *	@description	
 	 */
-	public	static function setMode($env)
+	public final static function setMode($env)
 	{
 		self::$env	=	$env;
 	}
 	/**
 	 *	@description	
 	 */
-	public	function doService($path, $attr = false, $type = 'get', $func = false)
+	public final function getEndpoint() : ?string
 	{
-		self::$con	=	new \Nubersoft\nRemote(self::$url, false);
-		# Create a define() for the API in your application key like:
-		# define('DIRECTSCALE_APIKEY', 'thekey123goeshere321');
-		self::$con->addHeader(...[
-			'Ocp-Apim-Subscription-Key',
-			self::getApiKey()
-		]);
-		
-		$data	=	self::$con->{__FUNCTION__}($path)->query($attr, false, $type)->getResults(false);
-		
-		if(preg_match('/statusCode/', $data)) {
-			throw new Exception($data);
-		}
-		
-		return (is_callable($func))? $func($data) : $data;
+		return self::getClient()->getUrl();
 	}
 	/**
 	 *	@description	
 	 */
-	public	function doPost($path, $attr = false, $func = false)
-	{
-		return $this->doService($path, $attr, 'post', $func);
-	}
-	/**
-	 *	@description	
-	 */
-	public	function doGet($path, $attr = false, $func = false)
-	{
-		# Append query string
-		if($attr)
-			$path	.=	'?'.http_build_query($attr);
-		# Send get
-		return $this->doService($path, $attr, 'get', $func);
-	}
-	/**
-	 *	@description	
-	 */
-	public	function doDelete($path, $attr = false, $func = false)
-	{
-		return $this->doService($path, $attr, 'delete', $func);
-	}
-	/**
-	 *	@description	
-	 */
-	public	function doPut($path, $attr = false, $func = false)
-	{
-		return $this->doService($path, $attr, 'put', $func);
-	}
-	/**
-	 *	@description	
-	 */
-	public	function doPatch($path, $attr = false, $func = false)
-	{
-		return $this->doService($path, $attr, 'patch', $func);
-	}
-	/**
-	 *	@description	
-	 */
-	public	function getEndpoint()
-	{
-		return self::$url;
-	}
-	/**
-	 *	@description	
-	 */
-	public	function normalizeKeys($array)
+	public final function normalizeKeys(array $array) : array
 	{
 		$new	=	[];
 		foreach($array as $key => $value) {
@@ -167,25 +110,69 @@ class Model extends \Nubersoft\nApp
 	/**
 	 *	@description	
 	 */
-	public	function getResourceFile($file)
+	public final function getResourceFile($file)
 	{
 		return (is_file($file = realpath(__DIR__.DS.'..'.DS.'resources').DS.ltrim($file, DS)))? $file : false;
 	}
 	/**
 	 *	@description	
 	 */
-	public	function formatReturn($string, $array = true)
+	public final function formatReturn($string, $to_array = true)
 	{
 		if(empty($string))
 			return [];
 		
-		return $this->normalizeKeys(json_decode($string, $array));
+		return (is_string($string))? $this->normalizeKeys(json_decode($string, $to_array)) : $string;
 	}
 	/**
 	 *	@description	
 	 */
-	public	function getConnection()
+	public final function getFullPath() : ?string
 	{
-		return self::$con;
+		return $this->enc($this->fullpath);
+	}
+	/**
+	 *	@description	
+	 */
+	public	function __toString()
+	{
+		return json_encode($this->data);
+	}
+	/**
+	 *	@description	
+	 */
+	public final function __call($method, $args =  false)
+	{
+		$class	=	'\\DirectScale\\'.str_replace(' ','\\',str_replace("_"," ",preg_replace('/^get_/','',$method)));
+		return	(is_array($args) && !empty($args))? new $class(...$args) : new $class();
+	}
+	/**
+	 *	@description	
+	 */
+	public final function getVal($array, $key, $default = null)
+	{
+		return (isset($array[$key]))? $array[$key] : $default;
+	}
+	/**
+	 *	@description	
+	 */
+	public final static	function setClient(IClient $Client)
+	{
+		self::$Client;
+	}
+	/**
+	 *	@description	
+	 */
+	public final function getClient() : IClient
+	{
+		if(empty(self::$Client)) {
+			
+			if(empty(self::$url))
+				self::setUrl();
+			
+			self::$Client	=	new Client(self::$url, self::getApiKey());
+		}
+		
+		return self::$Client;
 	}
 }
