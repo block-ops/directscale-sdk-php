@@ -3,12 +3,12 @@ namespace DirectScale;
 /**
  * @description    
  */
-class Architect extends Model
+class Architect extends IArchitect
 {
     /**
      * @description    
      */
-    public    function createUser($data)
+    public function create($data)
     {
         $settings    =    [
             "BackOfficeId" => $this->getVal($data, 'distid'),
@@ -58,8 +58,15 @@ class Architect extends Model
     /**
      * @description    
      */
-    public    function usernameExists($username)
+    public  function exists($username)
     {
         return $this->getClient()->doGet("validate/username/{$username}");
     }
+	/**
+	 *	@description	
+	 */
+	public	function delete($uid)
+	{
+        return $this->getClient()->doDelete("customers/{$uid}");
+	}
 }

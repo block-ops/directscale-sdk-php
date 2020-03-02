@@ -21,7 +21,7 @@ class User extends Model
         if(empty($args[0]))
             throw new Exception('A Distributor Id, internal id, or instance of \\DirectScale\\Builder is required in the construct');
         
-        if($args[0] instanceof Architect) {
+        if($args[0] instanceof IArchitect) {
             $this->Architect    =    $args[0];
         }
         elseif(filter_var($args[0], FILTER_VALIDATE_EMAIL)) {
