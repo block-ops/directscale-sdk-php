@@ -25,14 +25,14 @@ class User extends Model
             $this->Architect    =    $args[0];
         }
         elseif(filter_var($args[0], FILTER_VALIDATE_EMAIL)) {
-            $data    =    $this->getClient()->doGet('customers/', ['email' => $args[0]]);
+            $data    =    $this->getHttpClient()->doGet('customers/', ['email' => $args[0]]);
             $this->data    =    (!empty($data))? $this->formatReturn($data) : [];
         }
         else {
             if(empty($args[1]))
                 $this->distid    =    $args[0];
             else {
-                $data    =    $this->getClient()->doGet('customers/'.$args[0]);
+                $data    =    $this->getHttpClient()->doGet('customers/'.$args[0]);
                 $this->data    =    (!empty($data))? $this->formatReturn($data) : [];
             }
         }
@@ -53,8 +53,8 @@ class User extends Model
     {
         if(empty($this->data)) {
             if(!empty($this->distid)) {
-                $this->data        =    $this->getClient()->doGet('customers/?backofficeid='.$this->distid);
-
+                $this->data =   $this->getHttpClient()->doGet('customers/?backofficeid='.$this->distid);
+                
                 if(empty($this->data))
                     return $this->data;
 
@@ -72,9 +72,9 @@ class User extends Model
                 return $this->data;
             }
         }
-        
         $Conv    =    $this->getHelper('Conversion\Data');
-        $data    =    (!empty($this->data[0]))? $this->data : $this->formatReturn($this->data);
+        $data    =    (!empty($this->data[0]) && is_array($this->data[0]))? $this->data : $this->formatReturn($this->data);
+        
         $map    =    $Conv->xmlToArray($this->getResourceFile('gsmapping'.DS.'getdistinfo.xml'));
         $bill    =    $Conv->xmlToArray($this->getResourceFile('gsmapping'.DS.'billing.xml'));
         

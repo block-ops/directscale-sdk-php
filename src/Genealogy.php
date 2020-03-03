@@ -41,7 +41,7 @@ class Genealogy extends Model
         if(empty($data['general']['uid']))
             return [];
         
-        $data    =    $this->getClient()->doGet('customers/GetDownlineIds', [
+        $data    =    $this->getHttpClient()->doGet('customers/GetDownlineIds', [
             'associateId' => $data['general']['uid']
         ]);
         

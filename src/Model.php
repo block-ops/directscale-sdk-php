@@ -1,16 +1,12 @@
 <?php
 namespace DirectScale;
+use \DirectScale\Exception as DSException;
 /**
  * @description    
  */
 class Model extends \Nubersoft\nApp
 {
     protected    $headers, $errors, $response, $fullpath;
-    protected    static    $apikey;
-    protected    static    $con;
-    protected    static    $url        =    false;
-    protected    static    $version    =    'v1';
-    protected    static    $env        =    '';
     private        $obj                =    [];
     private        static    $Client;
     /**
@@ -23,45 +19,9 @@ class Model extends \Nubersoft\nApp
     /**
      * @description    
      */
-    public final static    function setApiKey($key)
-    {
-        self::$apikey    =    $key;
-    }
-    /**
-     * @description    
-     */
-    protected final static    function getApiKey()
-    {
-        return (!empty(self::$apikey))? self::$apikey : constant("DIRECTSCALE_".strtoupper(self::$env)."APIKEY");
-    }
-    /**
-     * @description    
-     */
-    public final static function setUrl()
-    {    
-        $type        =    (!empty(self::$env))? "-".strtolower(self::$env) : self::$env;
-        self::$url    =    "https://dsapi{$type}.directscale.com/".self::$version."/";
-    }
-    /**
-     * @description    
-     */
-    public final static function setVersion($version) : ?string
-    {
-        self::$version    =    $version;
-    }
-    /**
-     * @description    
-     */
-    public final static function setMode($env)
-    {
-        self::$env    =    $env;
-    }
-    /**
-     * @description    
-     */
     public final function getEndpoint() : ?string
     {
-        return self::getClient()->getUrl();
+        return self::getHttpClient()->getUrl();
     }
     /**
      * @description    
@@ -134,6 +94,79 @@ class Model extends \Nubersoft\nApp
     /**
      * @description    
      */
+    public final function getVal($array, $key, $default = null)
+    {
+        return (isset($array[$key]))? $array[$key] : $default;
+    }
+    /**
+     * @description    
+     */
+    public final static function setHttpClient(IClient $Client)
+    {
+        self::$Client;
+    }
+    /**
+     * @description    
+     */
+    public final function getHttpClient() : IClient
+    {
+        if(empty(self::$Client)) {
+            self::$Client    =    new Client();
+        }
+        
+        return self::$Client;
+    }
+    /**
+     * @description    
+     */
+    public    function doTry($func)
+    {
+        # Throws an exception at the base model level, so has to be caught here
+        try {
+            return $func();
+        }
+        catch (DSException $e) {
+            return false;
+        }
+    }
+	/**
+	 *	@description	
+	 */
+	public function xmlToWorkflow($string)
+	{
+        $file   =   (is_string($string))? simplexml_load_file($this->getResourceFile($string)) : $string;
+        
+        $result =   [];
+        foreach($file as $key => $row) {
+            
+            $attr   =   $row->attributes();
+            
+            if($attr)
+                $attr   =   json_decode(json_encode($attr), 1);
+                                        
+            $count  =   $row->count();
+            
+            if($count) {
+                 $result[$row->getName()]    =   $this->xmlToWorkflow($row->children());
+                
+                if($attr)
+                    $result[$row->getName()]    =   array_merge($result[$row->getName()], $attr);
+            }
+            else {
+                if($attr) {
+                    $result[$row->getName()]  = array_merge([$row->__toString()], $attr);
+                }
+                else {
+                    $result[$row->getName()]    =   $row->__toString();
+                }
+            }
+        }
+        
+        return $result;
+	}
+    /**
+     * @description    
+     */
     public    function __toString()
     {
         return json_encode($this->data);
@@ -145,34 +178,5 @@ class Model extends \Nubersoft\nApp
     {
         $class    =    '\\DirectScale\\'.str_replace(' ','\\',str_replace("_"," ",preg_replace('/^get_/','',$method)));
         return    (is_array($args) && !empty($args))? new $class(...$args) : new $class();
-    }
-    /**
-     * @description    
-     */
-    public final function getVal($array, $key, $default = null)
-    {
-        return (isset($array[$key]))? $array[$key] : $default;
-    }
-    /**
-     * @description    
-     */
-    public final static    function setClient(IClient $Client)
-    {
-        self::$Client;
-    }
-    /**
-     * @description    
-     */
-    public final function getClient() : IClient
-    {
-        if(empty(self::$Client)) {
-            
-            if(empty(self::$url))
-                self::setUrl();
-            
-            self::$Client    =    new Client(self::$url, self::getApiKey());
-        }
-        
-        return self::$Client;
     }
 }

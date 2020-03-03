@@ -5,14 +5,18 @@ namespace DirectScale;
  */
 class Client implements IClient
 {
-    private    $apikey, $fullpath, $response, $headers, $errors, $url;
+    private $fullpath, $response, $headers, $errors, $url, $content;
+    private static  $env    =    '';
+    private static  $con;
+    private static  $apikey;
+    private static  $version;
     /**
      * @description    
      */
-    public    function __construct(string $url, string $apikey)
+    public    function __construct($version = null)
     {
-        $this->url    =    $url;
-        $this->apikey    =    $apikey;
+        self::$version  =   ($version)?? 'v1';
+        $this->url      =   $this->setUrl()->getUrl();
     }
     /**
      * @description    
@@ -40,15 +44,16 @@ class Client implements IClient
             $content    =    (!empty($attr))? 'Content-type: application/json' : null;
         }
         
+        $this->content  =   (!empty($content))? $content : null;
+        
         $opts = [
             "http" => [
                 'ignore_errors' => true,
                 "method" => strtoupper($type),
                 "header" => implode(PHP_EOL, [
-                    'Ocp-Apim-Subscription-Key: '.$this->apikey,
+                    'Ocp-Apim-Subscription-Key: '.self::getApiKey(),
                     # Only create content if not doing a get
-                    ((!empty($content))? $content : null)
-                    
+                    $this->content
                 ])
             ]
         ];
@@ -58,6 +63,7 @@ class Client implements IClient
             $opts['http']['content']    =    json_encode($attr);
         
         $attr_str    =    ($type == 'get' && !empty($attr))? '?'.http_build_query($attr) : '';
+        
         # Fetch
         $this->response    =    file_get_contents(...[
             $this->fullpath = $this->url.$path.$attr_str,
@@ -65,21 +71,21 @@ class Client implements IClient
             stream_context_create($opts)
         ]);
         
-        $this->headers    =    $http_response_header;
-        
-        $this->errors    =    false;
-        
+        $this->headers  =    $http_response_header;
+        $this->errors   =    false;
+        # Go through headers and see if there are any errors
         foreach($this->headers as $hds) {
             if(preg_match('/X-DirectScale-Message/i', $hds)) {
                 $this->errors    =    str_replace('X-DirectScale-Message:', '', $hds);
             }
         }
-        
+        # Set the response to empty and throw exception
         if(!empty($this->errors)) {
             if(empty($this->response))
                 $this->response    =    "[]";
             
-            throw new Exception(json_encode(array_merge(['msg' => $this->errors], json_decode($this->response, 1))));
+            throw new Exception(
+                json_encode(array_merge(['msg' => $this->errors], json_decode($this->response, 1))));
         }
         
         return (is_callable($func))? $func($this->response) : $this->response;
@@ -97,13 +103,6 @@ class Client implements IClient
     public    function getResponseHeaders()
     {
         return $this->headers;
-    }
-    /**
-     * @description    
-     */
-    public    function getUrl()
-    {
-        return $this->fullpath;
     }
     /**
      * @description    
@@ -140,5 +139,56 @@ class Client implements IClient
     public    function doPatch($path, $attr = false, $func = false)
     {
         return $this->doService($path, $attr, 'patch', $func);
+    }
+    /**
+     * @description    
+     */
+    public static final function setApiKey($key)
+    {
+        self::$apikey    =    $key;
+    }
+    /**
+     * @description    
+     */
+    private final function getApiKey()
+    {
+        return (self::$apikey)?? constant("DIRECTSCALE_".strtoupper(self::$env)."APIKEY");
+    }
+    /**
+     * @description    
+     */
+    public final function setUrl()
+    {    
+        $type        =    (!empty(self::$env))? "-".strtolower(self::$env) : self::$env;
+        $this->url    =    "https://dsapi{$type}.directscale.com/".self::$version."/";
+        return $this;
+    }
+    	/**
+	 *	@description	
+	 */
+	public	function getUrl()
+	{
+        return $this->url;
+	}
+    /**
+     * @description    
+     */
+    public  final function getStatement()
+    {
+        return $this->fullpath;
+    }
+    /**
+     * @description    
+     */
+    public final function setVersion($version)
+    {
+        self::$version    =    $version;
+    }
+    /**
+     * @description    
+     */
+    public static final function setMode($env)
+    {
+        self::$env    =    $env;
     }
 }

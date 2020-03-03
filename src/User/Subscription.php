@@ -1,11 +1,17 @@
 <?php
 namespace DirectScale\User;
+
+use \DirectScale\ {
+    Exception as DSException,
+    IArchitect,
+    Model
+};
 /**
  * @description    
  */
-class Subscription
+class Subscription extends Model implements IArchitect
 {
-    private    $User, $data, $autoships;
+    private $User, $data, $autoships;
     /**
      * @description    
      */
@@ -14,29 +20,39 @@ class Subscription
         $this->User    =    $User;
         $this->data    =    (empty($this->User->getData()))? $this->User->getDistInfo() : $this->User->getData();
         
-        if(empty($this->data['general']['uid'])) {
+        if(!$this->exists()) {
             return false;
         }
         
-        $this->autoships    =    $this->User->getClient()->doGet('customers/'.$this->data['general']['uid'].'/autoships');
+        $this->autoships    =    $this->getHttpClient()->doGet('customers/'.$this->data['general']['uid'].'/autoships');
         $this->User->setAttr('autoship', (empty($this->autoships))? [] : $this->autoships);
     }
+	/**
+	 *	@description	
+	 */
+	public	function exists()
+	{
+        return (!empty($this->data['general']['uid']));
+	}
+	/**
+	 *	@description	
+	 */
+	public	function create()
+	{
+        
+	}
     /**
      * @description    
      */
-    public    function getOrder()
+    public    function delete()
     {
-        return $this->autoships;
-    }
-    /**
-     * @description    
-     */
-    public    function delete($id = false)
-    {
-        $count    =    count($this->autoships);
+        $args   =   func_get_args();
+        $id = ($args[0])?? false;
+        
+        $count  =   count($this->autoships);
         if($count == 1) {
             # Delete
-            $this->User->getClient()->doDelete('orders/autoship/'.$this->autoships[0]['id']);
+            $this->getHttpClient()->doDelete('orders/autoship/'.$this->autoships[0]['id']);
             # Reset the autoships
             $this->__construct($this->User);
         }
@@ -47,7 +63,7 @@ class Subscription
                 # See if an id match OR there is no specific id to delete
                 if($idmatch || empty($id)) {
                     # Delete the autoship if set
-                    $this->User->getClient()->doDelete('orders/autoship/'.$as['id']);
+                    $this->User->getHttpClient()->doDelete('orders/autoship/'.$as['id']);
                     # Stop if an id is supplied
                     if(!empty($id))
                         break;
@@ -57,6 +73,13 @@ class Subscription
             $this->__construct($this->User);
         }
         
+        return $this->autoships;
+    }
+    /**
+     * @description    
+     */
+    public    function getOrder()
+    {
         return $this->autoships;
     }
 }

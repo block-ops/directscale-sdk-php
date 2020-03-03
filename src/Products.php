@@ -1,5 +1,7 @@
 <?php
 namespace DirectScale;
+
+use \DirectScale\Exception as DSException;
 /**
  * @description    
  */
@@ -16,7 +18,7 @@ class Products extends Model
         if($sku)
             return $this->getBySku($sky);
         
-        $products    =    $this->getClient()->doGet('products/items');
+        $products    =    $this->getHttpClient()->doGet('products/items');
         
         if(empty($products)) {
             return  $this->products    =    [];
@@ -47,9 +49,9 @@ class Products extends Model
         # Note this produces a fatal error if the currency and lang is empty despite
         # the docs saying they are optional
         try {
-            $data    =    $this->getClient()->doGet('products/item/sku/'.$sku, (empty($settings))? false : $settings);
+            $data    =    $this->getHttpClient()->doGet('products/item/sku/'.$sku, (empty($settings))? false : $settings);
         }
-        catch(\DirectScale\Exception $e) {
+        catch(DSException $e) {
             return $this->products    =    [];
         }
         $this->products    =    $this->formatReturn($data);

@@ -12,7 +12,7 @@ class Stores extends Model
     public    function __construct(Products $Products)
     {
         $this->Products    =    $Products;
-        $stores            =    $this->getClient()->doGet('products/stores');
+        $stores            =    $this->getHttpClient()->doGet('products/stores');
         $stores            =    (!empty($stores))? $this->formatReturn($stores) : [];
         
         foreach($stores as $store) {
@@ -74,7 +74,7 @@ class Stores extends Model
         if(empty($sid)) {
             $new    =    [];
             foreach($this->getStores() as $sid => $name) {
-                $cat    =    $this->getClient()->doGet("products/store/{$sid}/categories");
+                $cat    =    $this->getHttpClient()->doGet("products/store/{$sid}/categories");
                 if(empty($cat) || trim($cat) == '[]')
                     continue;
                 
@@ -85,7 +85,7 @@ class Stores extends Model
         }
         # This will fetch a specfic category
         else {
-            $data    =    $this->getClient()->doGet("products/store/{$sid}/categories");
+            $data    =    $this->getHttpClient()->doGet("products/store/{$sid}/categories");
 
             if(empty($data) || trim($data) == '[]') {
                 return [];
@@ -99,7 +99,7 @@ class Stores extends Model
      */
     public    function getRegions()
     {
-        $data    =    $this->getClient()->doGet('products/regions');
+        $data    =    $this->getHttpClient()->doGet('products/regions');
         
         if(empty($data)) {
             return $this->regions    =    [];

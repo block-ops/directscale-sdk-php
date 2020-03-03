@@ -1,27 +1,31 @@
 <?php
 namespace DirectScale\User;
+
+use \DirectScale\ {
+    IArchitect,
+    Model,
+    User
+};
 /**
  * @description    
  */
-class Auth extends \DirectScale\User
+class Auth extends Model
 {
+    protected   $Architect;
     /**
-     * @description    
-     */
-    public    function __construct()
-    {
-        $args    =    func_get_args();
-        if(!empty($args)) {
-            parent::__construct(...$args);
-        }
-    }
+	 *	@description	
+	 */
+	public	function __construct(IArchitect $Architect)
+	{
+        $this->Architect    =   $Architect;
+	}
     /**
      * @description    
      */
     public    function validate($password) : bool
     {
         return $this->doTry(function() use ($password) {
-            return $this->getClient()->doGet('validate/login', [
+            return $this->getHttpClient()->doGet('validate/login', [
                 'username' => $this->createDataSet()->getData('user')['username'],
                 'password' => $password
             ]);
@@ -33,29 +37,23 @@ class Auth extends \DirectScale\User
     public    function usernameExists($username) : bool
     {
         return $this->doTry(function() use ($username) {
-            return $this->Architect->usernameExists($username);
+            return $this->Architect->exists($username);
         });
     }
     /**
      * @description    
      */
-    public    function emailExists($email)
+    public    function emailExists($email) : bool
     {
         return $this->doTry(function() use ($email){
-            return $this->getClient()->doGet("validate/email-address/{$email}");
+            return $this->Architect->exists($email, 'email-address');
         }) == 'True';
     }
-    /**
-     * @description    
-     */
-    public    function doTry($func)
-    {
-        # Throws an exception at the base model level, so has to be caught here
-        try {
-            return $func();
-        }
-        catch (\DirectScale\Exception $e) {
-            return false;
-        }
-    }
+	/**
+	 *	@description	
+	 */
+	public	function distidExists(User $User)
+	{
+        return $User->getDistInfo();
+	}
 }

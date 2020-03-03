@@ -3,7 +3,7 @@ namespace DirectScale;
 /**
  * @description    
  */
-abstract class IArchitect extends Model
+interface IArchitect
 {
 	/**
 	 *	@description	

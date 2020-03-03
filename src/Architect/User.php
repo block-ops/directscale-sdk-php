@@ -1,16 +1,32 @@
 <?php
-namespace DirectScale;
+namespace DirectScale\Architect;
+
+use \DirectScale\ {
+    Filter,
+    Model,
+    IArchitect,
+    Exception as DSException
+};
 /**
  * @description    
  */
-class Architect extends IArchitect
+class User extends Model implements IArchitect
 {
     /**
      * @description    
      */
-    public function create($data)
+    public function create()
     {
-        $settings    =    [
+        $args   =   func_get_args();
+        $data   =   ($args[0])?? null;
+        $map    =   $this->xmlToWorkflow("creation".DS."user.xml");
+        
+        if(!$data)
+            throw new DSException("Creation data is required");
+        
+        $settings   =   (new Filter())->multiLevelMapper($data, $map, $data);
+        
+        /*$settings    =    [
             "BackOfficeId" => $this->getVal($data, 'distid'),
             "BirthDate" => $this->getVal($data, 'birth_date'),
             "CompanyName" => $this->getVal($data, 'company'),
@@ -52,21 +68,47 @@ class Architect extends IArchitect
             "Username" => $username = $this->getVal($data, 'username', $this->getVal($data, 'email')),
             "WebAlias" => preg_replace('/[^\d\w]/', '', $username).time()
         ];
+        */
         
-        return $this->getClient()->doPost('customers/', $settings);
+        return $this->getHttpClient()->doPost('customers/', $settings);
     }
     /**
      * @description    
      */
-    public  function exists($username)
+    public  function exists()
     {
-        return $this->getClient()->doGet("validate/username/{$username}");
+        $args   =   func_get_args();
+        $username   =   ($args[0])?? null;
+        
+        if(!$username)
+            throw new DSException("Can not be empty username");
+        
+        return $this->getHttpClient()->doGet("validate/username/{$username}");
     }
 	/**
 	 *	@description	
 	 */
-	public	function delete($uid)
+	public	function delete()
 	{
-        return $this->getClient()->doDelete("customers/{$uid}");
+        $args   =   func_get_args();
+        $uid   =   ($args[0])?? null;
+        if(!$uid)
+            throw new DSException("Can not be empty user id");
+        
+        return $this->getHttpClient()->doDelete("customers/{$uid}");
+	}
+	/**
+	 *	@description	
+	 */
+	public	function getTypeByTitle($name)
+	{
+        $name   =   strtolower($name);
+        
+        if(in_array($name, ['distributor', 'member']))
+            return 1;
+        elseif(in_array($name, ['customer', 'retail']))
+            return 2;
+        
+        throw new DSException("You need a name (string) to fetch the type numeric.");
 	}
 }

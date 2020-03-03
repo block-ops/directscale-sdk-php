@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map>
+    <BackOfficeId>~distid~</BackOfficeId>
+    <BirthDate>~birth_date~</BirthDate>
+    <CompanyName>~company~</CompanyName>
+    <CustomerStatus>~status~</CustomerStatus>
+    <CustomerType>~type~</CustomerType>
+    <DefaultShippingAddress>
+        <Street1>~shipping_line_1~</Street1>
+        <Street2>~shipping_line_2~</Street2>
+        <Street3>~shipping_line_3~</Street3>
+        <PostalCode>~shipping_zip~</PostalCode>
+        <City>~shipping_city~</City>
+        <Region filter="FUNC::strtoupper">~shipping_state~</Region>
+        <CountryCode filter="FUNC::strtoupper">~shipping_country~</CountryCode>
+    </DefaultShippingAddress>
+    <EmailAddress validate="email">~email~</EmailAddress>
+    <ExternalReferenceId>~external_reference~</ExternalReferenceId>
+    <FirstName>~first_name~</FirstName>
+    <LastName>~last_name~</LastName>
+    <LanguageCode alt="en">~language~</LanguageCode>
+    <Password>~password~</Password>
+    <PrimaryAddress>
+        <Street1>~billing_line_1~</Street1>
+        <Street2>~billing_line_2~</Street2>
+        <Street3>~billing_line_3~</Street3>
+        <PostalCode>~billing_zip~</PostalCode>
+        <City>~billing_city~</City>
+        <Region filter="FUNC::strtoupper">~billing_state~</Region>
+        <CountryCode filter="FUNC::strtoupper">~billing_country~</CountryCode>
+    </PrimaryAddress>
+    <PrimaryPhone>~phone_1~</PrimaryPhone>
+    <SecondaryPhone>~phone_2~</SecondaryPhone>
+    <SendEmails alt="true">~email_opt_in~</SendEmails>
+    <SignUpDate alt="FUNC::date[Y-m-d]">~join_date~</SignUpDate>
+    <SponsorId validate="numeric">~sponsor_id~</SponsorId>
+    <TaxExemptId>~tax_exempt_id~</TaxExemptId>
+    <TaxId>~tax_id~</TaxId>
+    <TermsAccepted alt="true">~terms_accepted~</TermsAccepted>
+    <TextPhone>~phone_cell~</TextPhone>
+    <Username alt="~email~">~username~</Username>
+    <WebAlias filter="CLASS::DirectScale/Filter->toWebAlias">~username~</WebAlias>
+</map>
