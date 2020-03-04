@@ -6,16 +6,10 @@ use \DirectScale\Exception as DSException;
  */
 class Model extends \Nubersoft\nApp
 {
-    protected    $headers, $errors, $response, $fullpath;
-    private        $obj                =    [];
-    private        static    $Client;
-    /**
-     * @description    
-     */
-    public    function __construct()
-    {
-        //self::setUrl();
-    }
+    protected $headers, $errors, $response, $fullpath;
+    private $obj = [];
+    private static $Client;
+    const DS    =   DIRECTORY_SEPARATOR;
     /**
      * @description    
      */
@@ -72,7 +66,9 @@ class Model extends \Nubersoft\nApp
      */
     public final function getResourceFile($file)
     {
-        return (is_file($file = realpath(__DIR__.DS.'..'.DS.'resources').DS.ltrim($file, DS)))? $file : false;
+        $DS =   self::DS;
+        $file = realpath(__DIR__."{$DS}..{$DS}resources").$DS.ltrim($file, $DS);
+        return (is_file($file))? $file : false;
     }
     /**
      * @description    
@@ -94,7 +90,7 @@ class Model extends \Nubersoft\nApp
     /**
      * @description    
      */
-    public final function getVal($array, $key, $default = null)
+    public final function getVal(array $array, string $key, $default = null)
     {
         return (isset($array[$key]))? $array[$key] : $default;
     }
@@ -103,7 +99,7 @@ class Model extends \Nubersoft\nApp
      */
     public final static function setHttpClient(IClient $Client)
     {
-        self::$Client;
+        self::$Client   =   $Client;
     }
     /**
      * @description    
@@ -121,6 +117,8 @@ class Model extends \Nubersoft\nApp
      */
     public    function doTry($func)
     {
+        if(!is_callable($func))
+            throw new DSException("You must use a function to encapsulate your call.");
         # Throws an exception at the base model level, so has to be caught here
         try {
             return $func();
