@@ -10,6 +10,7 @@ class Client implements IClient
     private static  $con;
     private static  $apikey;
     private static  $version;
+    private static  $Logger;
     /**
      * @description    
      */
@@ -77,6 +78,8 @@ class Client implements IClient
         foreach($this->headers as $hds) {
             if(preg_match('/X-DirectScale-Message/i', $hds)) {
                 $this->errors    =    str_replace('X-DirectScale-Message:', '', $hds);
+                if(!empty(self::$Logger))
+                    self::$Logger->error(date('Y-m-d H:i:s').' '.$this->errors);
             }
         }
         # Set the response to empty and throw exception
@@ -191,4 +194,11 @@ class Client implements IClient
     {
         self::$env    =    $env;
     }
+	/**
+	 *	@description	
+	 */
+	public	static  function setLogger(ILogger $Logger)
+	{
+        self::$Logger   =   $Logger;
+	}
 }

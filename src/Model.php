@@ -172,7 +172,7 @@ class Model extends \Nubersoft\nApp
     /**
      * @description    
      */
-    public final function __call($method, $args =  false)
+    public function __call($method, $args =  false)
     {
         $class    =    '\\DirectScale\\'.str_replace(' ','\\',str_replace("_"," ",preg_replace('/^get_/','',$method)));
         return    (is_array($args) && !empty($args))? new $class(...$args) : new $class();

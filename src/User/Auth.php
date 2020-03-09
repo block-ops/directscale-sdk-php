@@ -22,11 +22,11 @@ class Auth extends Model
     /**
      * @description    
      */
-    public    function validate($password) : bool
+    public    function validate(string $username, string $password) : bool
     {
-        return $this->doTry(function() use ($password) {
+        return $this->doTry(function() use ($username, $password) {
             return $this->getHttpClient()->doGet('validate/login', [
-                'username' => $this->createDataSet()->getData('user')['username'],
+                'username' => $username,
                 'password' => $password
             ]);
         });

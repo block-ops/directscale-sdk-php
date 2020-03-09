@@ -36,11 +36,12 @@ class User extends Model implements IArchitect
     {
         $args   =   func_get_args();
         $username   =   ($args[0])?? null;
+        $type   =   ($args[1])?? 'username';
         
         if(!$username)
             throw new DSException("Can not be empty username");
         
-        return $this->getHttpClient()->doGet("validate/username/{$username}");
+        return $this->getHttpClient()->doGet("validate/{$type}/{$username}");
     }
 	/**
 	 *	@description	

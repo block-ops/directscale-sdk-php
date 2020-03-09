@@ -8,33 +8,37 @@ interface IClient
     /**
      * @description    
      */
-    public    function doService();
+    public  function doService();
     /**
      * @description    
      */
-    public    function getErrors();
+    public  function getErrors();
     /**
      * @description    
      */
-    public    function getResponseHeaders();
+    public  function getResponseHeaders();
     /**
      * @description    
      */
-    public    function doPost($path, $attr = false, $func = false);
+    public  function doPost($path, $attr = false, $func = false);
     /**
      * @description    
      */
-    public    function doGet($path, $attr = false, $func = false);
+    public  function doGet($path, $attr = false, $func = false);
     /**
      * @description    
      */
-    public    function doDelete($path, $attr = false, $func = false);
+    public  function doDelete($path, $attr = false, $func = false);
     /**
      * @description    
      */
-    public    function doPut($path, $attr = false, $func = false);
+    public  function doPut($path, $attr = false, $func = false);
     /**
      * @description    
      */
-    public    function doPatch($path, $attr = false, $func = false);
+    public  function doPatch($path, $attr = false, $func = false);
+	/**
+	 *	@description	
+	 */
+	public	static  function setLogger(ILogger $Logger);
 }

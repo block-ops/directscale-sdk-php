@@ -6,6 +6,7 @@ namespace DirectScale;
 class Genealogy extends Model
 {
     protected    $data, $User;
+    private $ids;
     /**
      * @description    
      */
@@ -16,17 +17,33 @@ class Genealogy extends Model
     /**
      * @description    
      */
-    public    function getDownline()
+    public    function getDownline($start = 1, $end = false)
     {
-        $ids    =    $this->getDownlineIds();
+        $this->fillIds();
         
-        if(empty($ids)) {
+        if(empty($this->ids)) {
             return $this->data    =    [];
         }
         
-        foreach($ids as $id) {
-            $User            =    new User($id, true);
-            $this->data[]    =    $User->getDistInfo(true);
+        $i  =   1;
+        foreach($this->ids as $id) {
+            
+            if($start != 1) {
+                if($start > $i) {
+                    $i++;
+                    continue;
+                }
+            }
+            
+            if(is_numeric($end)) {
+                if($i > $end) {
+                    break;
+                }
+            }
+            
+            $this->getDistInfoFromId($id, false);
+            
+            $i++;
         }
         
         return $this->data;
@@ -45,6 +62,76 @@ class Genealogy extends Model
             'associateId' => $data['general']['uid']
         ]);
         
-        return (!empty($data))? $this->formatReturn($data) : [];
+        return $this->ids   =   (!empty($data))? $this->formatReturn($data) : [];
     }
+	/**
+	 *	@description	
+	 */
+	public	function inDownLine($id) : bool
+	{
+        $this->fillIds();
+        
+        if(empty($this->ids))
+            return false;
+        
+        return in_array($id, $this->ids);
+	}
+	/**
+	 *	@description	
+	 */
+	protected	function fillIds()
+	{
+        if(empty($this->ids))
+            $this->ids    =    $this->getDownlineIds();
+        
+        return $this;
+	}
+	/**
+	 *	@description	
+	 */
+	public	function getDistInfoFromId($id, $clear = true)
+	{
+        if(!is_array($id))
+            $id =   [$id];
+        
+        if($clear || empty($this->ids))
+            $this->data =   [];
+        
+        if(empty($this->ids))
+            return $this;
+        
+        foreach($id as $idf) {
+            if(!in_array($idf, $this->ids))
+                continue;
+            $User   =   new User($idf, true);
+            $this->data[]   =   $User->getDistInfo(true);
+        }
+        
+        return $this;
+	}
+	/**
+	 *	@description	
+	 */
+	public	function __call($method, $args = false)
+	{
+        switch(strtolower($method)) {
+            case('get'):
+                if(!empty($this->ids)) {
+                    $search =   (!empty($args[0]));
+                    $id =   ($search && (is_numeric($args[0]) || is_array($args[0])))? $args[0] : $this->ids;
+                    return $this->getDistInfoFromId($id, true)->data;
+                }
+                return [];
+            case('getcount'):
+                return (is_array($this->ids))? count($this->ids) : 0;
+            case('getdata'):
+                return $this->data;
+            case('getall'):
+                return [
+                    'data' => $this->data,
+                    'ids' => $this->ids,
+                    'count' => $this->getCount()
+                ];
+        }
+	}
 }
